@@ -17,3 +17,6 @@ Ethereum
 Other exchanges
 
 Credit for much of the calculation code goes to https://github.com/vst/accfifo
+His code is released under the BSD License, and files containing it include the license text.
+
+All other code released under AGPLv3.
