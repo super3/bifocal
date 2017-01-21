@@ -5,6 +5,7 @@ Goals:
 * Compile data about Bitcoin and other cryptocurrency buys and sells via block explorer APIs.
 * Calculate holdings, gains and losses in USD using public price APIs.
 * Provide spreadsheets detailing transactions and gains.
+* Provide choice of FIFO vs LIFO
 
 Will Support:
 Bitcoin
