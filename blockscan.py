@@ -9,19 +9,19 @@ class blockscan:
         pass
 
     def _request(self, **kwargs):
-        uri = 'https://counterpartychain.io/api/%s' % utils.encode_args(kwargs)
+        uri = 'http://xcp.blockscan.com/api2?%s' % utils.encode_args(kwargs)
         ret = requests.get(uri)
         return utils.parse_json(ret)
 
-    def _get_tx_by_id(self, txid):
-        return _request(
+    def get_tx_by_id(self, txid):
+        return self._request(
             module='transaction',
             action='info',
             txhash=txid
         )
 
     def get_address_transactions(self, address, asset):
-        return _request(
+        return self._request(
             module='address',
             action='credt_debit',
             btc_address=address,
@@ -29,7 +29,9 @@ class blockscan:
         )
 
     def get_source(self, txid):
-        pass
+        tx = self.get_tx_by_id(txid)
+        return tx['data']['source']
 
     def get_destination(self, txid):
-        pass
+        tx = self.get_tx_by_id(txid)
+        return tx['data']['destination']
