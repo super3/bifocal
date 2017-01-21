@@ -1,5 +1,4 @@
 import requests
-import json
 import utils
 import hmac
 import hashlib

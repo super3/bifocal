@@ -16,6 +16,10 @@ Might support:
 Ethereum
 Other exchanges
 
+Unsolved problems:
+Counterparty block explorer APIs only return the most recent 100 transactions for an address.
+
+
 Credit for much of the calculation code goes to https://github.com/vst/accfifo
 His code is released under the BSD License, and files containing it include the license text.
 

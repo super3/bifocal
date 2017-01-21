@@ -28,23 +28,46 @@
 #
 # (See http://opensource.org/licenses/BSD-2-Clause)
 
-import datetime
-import utils
-from collections import deque
-from transaction import Transaction
-
 
 class LIFO(IFO):
 
     def __init__(self, transactions=None):
         IFO.__init__(self, transactions)
-        self._compute()
-
-    def _push(self, transaction):
-        pass
 
     def _fill(self, transactions):
-        pass
+        transaction = transaction.copy()
 
-    def _compute(self):
-        pass
+        while not transaction.zero:
+            if self.is_empty:
+                self._push(transaction)
+                return
+
+            latest = self.inventory.pop()
+
+            if transaction.size <= earliest.size:
+                munched = latest.copy(-transaction.quantity)
+
+                latest.quantity += transaction.quantity
+
+                if latest.quantity != 0:
+                    self.inventory.append(latest)
+
+                gain = munched.quantity * (transaction.price - munched.price)
+
+                self.trace.append([munched, transaction, gain])
+
+                self._balance += transaction.quantity
+                self._gains += gain
+
+                return
+            else:
+                munched = transaction.copy(-latest.quantity)
+
+                transaction.quantity += earliest.quantity
+
+                gain = latest.quantity * (munched.price - latest.price)
+
+                self.trace.append([latest, munched, gain])
+
+                self._balance += munched.quantity
+                self._gains += gain

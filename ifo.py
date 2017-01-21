@@ -48,6 +48,7 @@ class IFO():
         self._gains = 0.0
 
         self._entires = utils.sort_by_timestamp(self._entries)
+        self._compute()
 
     @property
     def is_empty(self):
@@ -85,3 +86,17 @@ class IFO():
     @property
     def gains(self):
         return self._gains
+
+    def _push(self, transaction):
+        self.inventory.append(transaction)
+        self._balance += transaction.quantity
+
+    def _compute(self):
+        for transaction in self._transactions:
+            if ((self._balance >= 0 and transaction.buy)
+                    or (self._balance <= 0 and transaction.sell)):
+                self._push(transaction)
+            elif not transaction.zero:
+                self._fill(transaction)
+
+        self._finished_at = datetime.datetime.now()

@@ -28,21 +28,11 @@
 #
 # (See http://opensource.org/licenses/BSD-2-Clause)
 
-import datetime
-import utils
-from collections import deque
-from transaction import Transaction
-
 
 class FIFO(IFO):
 
     def __init__(self, transactions=None):
         IFO.__init__(self, transactions)
-        self._compute()
-
-    def _push(self, transaction):
-        self.inventory.append(transaction)
-        self._balance += transaction.quantity
 
     def _fill(self, transaction):
         transaction = transaction.copy()
@@ -62,12 +52,12 @@ class FIFO(IFO):
                 if earliest.quantity != 0:
                     self.inventory.appendleft(earliest)
 
-                self.trace.append([munched, transaction])
+                gain = munched.quantity * (transaction.price - munched.price)
+
+                self.trace.append([munched, transaction, gain])
 
                 self._balance += transaction.quantity
-
-                self._gains += (transaction.quantity * -1 * transaction.price)
-                self._gains -= (munched.quantity * munched.price)
+                self._gains += gain
 
                 return
             else:
@@ -75,19 +65,9 @@ class FIFO(IFO):
 
                 transaction.quantity += earliest.quantity
 
-                self.trace.append([earliest, munched])
+                gain = earliest.quantity * (munched.price - earliest.price)
+
+                self.trace.append([earliest, munched, gain])
 
                 self._balance += munched.quantity
-
-                self._gains += (munched.quantity * -1 * munched.price)
-                self._gains -= (earliest.quantity * earliest.price)
-
-    def _compute(self):
-        for transaction in self._transactions:
-            if ((self._balance >= 0 and transaction.buy)
-                    or (self._balance <= 0 and transaction.sell)):
-                self._push(transaction)
-            elif not transaction.zero:
-                self._fill(transaction)
-
-        self._finished_at = datetime.datetime.now()
+                self._gains += gain
