@@ -34,7 +34,7 @@ class LIFO(IFO):
     def __init__(self, transactions=None):
         IFO.__init__(self, transactions)
 
-    def _fill(self, transactions):
+    def _fill(self, transaction):
         transaction = transaction.copy()
 
         while not transaction.zero:
@@ -44,7 +44,7 @@ class LIFO(IFO):
 
             latest = self.inventory.pop()
 
-            if transaction.size <= earliest.size:
+            if transaction.size <= latest.size:
                 munched = latest.copy(-transaction.quantity)
 
                 latest.quantity += transaction.quantity
@@ -63,7 +63,7 @@ class LIFO(IFO):
             else:
                 munched = transaction.copy(-latest.quantity)
 
-                transaction.quantity += earliest.quantity
+                transaction.quantity += latest.quantity
 
                 gain = latest.quantity * (munched.price - latest.price)
 
