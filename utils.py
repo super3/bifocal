@@ -41,5 +41,5 @@ def encode_args(self, args_dict):
     return encoded[:-1]
 
 
-def sort_by_timestamp(entries):
-    pass
+def sort_by_timestamp(transactions):
+    return sorted(transactions, key=lambda k: k.timestamp)
