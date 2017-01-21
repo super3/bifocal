@@ -28,9 +28,6 @@
 #
 # (See http://opensource.org/licenses/BSD-2-Clause)
 
-import datetime
-from collections import deque
-
 
 class Transaction:
 
