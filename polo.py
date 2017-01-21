@@ -6,7 +6,7 @@ import hashlib
 import time
 
 
-class polo:
+class Polo:
 
     def __init__(self, api_key, secret):
         self._api_key = api_key

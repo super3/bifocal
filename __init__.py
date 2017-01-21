@@ -1,5 +1,5 @@
-from polo import polo
-from blockscan import blockscan
+from polo import Polo
+from blockscan import Blockscan
 from fifo import fifo
 from lifo import lifo
 import utils

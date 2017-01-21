@@ -3,7 +3,7 @@ import json
 import utils
 
 
-class blockscan:
+class Blockscan:
 
     def __init__(self):
         pass
