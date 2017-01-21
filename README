@@ -1,0 +1,18 @@
+Work in progress
+
+Goals:
+* Accept cryptocurrency addresses as inputs
+* Compile data about Bitcoin and other cryptocurrency buys and sells via block explorer APIs.
+* Calculate holdings, gains and losses in USD using public price APIs.
+* Provide spreadsheets detailing transactions and gains.
+
+Will Support:
+Bitcoin
+Counterparty
+Poloniex
+
+Might support:
+Ethereum
+Other exchanges
+
+Credit for much of the calculation code goes to https://github.com/vst/accfifo

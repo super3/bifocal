@@ -24,12 +24,22 @@ def timestamp_floor(timestamp):
 
 
 def parse_json(self, ret):
+    """
+    Return a dictionary from a requests response
+    """
     ret_json = json.loads(ret.text)
     return ret_json
 
 
 def encode_args(self, args_dict):
-    payload = ''
+    """
+    Encode a dictionary for url encoding. Example: 'key=val&key2=val2'
+    """
+    encoded = ''
     for key, value in args_dics.iteritems():
-        payload += "%s=%s&" % (key, value)
-    return payload[:-1]
+        encoded += "%s=%s&" % (key, value)
+    return encoded[:-1]
+
+
+def sort_by_timestamp(entries):
+    pass

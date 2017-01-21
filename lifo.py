@@ -34,60 +34,17 @@ from collections import deque
 from transaction import Transaction
 
 
-class FIFO(IFO):
+class LIFO(IFO):
 
     def __init__(self, transactions=None):
         IFO.__init__(self, transactions)
         self._compute()
 
     def _push(self, transaction):
-        self.inventory.append(transaction)
-        self._balance += transaction.quantity
+        pass
 
-    def _fill(self, transaction):
-        transaction = transaction.copy()
-
-        while not transaction.zero:
-            if self.is_empty:
-                self._push(transaction)
-                return
-
-            earliest = self.inventory.popleft()
-
-            if transaction.size <= earliest.size:
-                munched = earliest.copy(-transaction.quantity)
-
-                earliest.quantity += transaction.quantity
-
-                if earliest.quantity != 0:
-                    self.inventory.appendleft(earliest)
-
-                self.trace.append([munched, transaction])
-
-                self._balance += transaction.quantity
-
-                self._gains += (transaction.quantity * -1 * transaction.price)
-                self._gains -= (munched.quantity * munched.price)
-
-                return
-            else:
-                munched = transaction.copy(-earliest.quantity)
-
-                transaction.quantity += earliest.quantity
-
-                self.trace.append([earliest, munched])
-
-                self._balance += munched.quantity
-
-                self._gains += (munched.quantity * -1 * munched.price)
-                self._gains -= (earliest.quantity * earliest.price)
+    def _fill(self, transactions):
+        pass
 
     def _compute(self):
-        for transaction in self._transactions:
-            if ((self._balance >= 0 and transaction.buy)
-                    or (self._balance <= 0 and transaction.sell)):
-                self._push(transaction)
-            elif not transaction.zero:
-                self._fill(transaction)
-
-        self._finished_at = datetime.datetime.now()
+        pass
