@@ -1,6 +1,6 @@
 import requests
 import json
-import utils
+#import utils
 
 
 class Blockscan:

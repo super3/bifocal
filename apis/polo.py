@@ -1,5 +1,5 @@
 import requests
-import utils
+#import utils
 import hmac
 import hashlib
 import time
