@@ -1,6 +1,6 @@
 import requests
 import json
-#import utils
+from ifo import utils
 
 
 class Coindesk:
@@ -14,7 +14,7 @@ class Coindesk:
 
     def _request(self, **kwargs):
         uri = ('http(s)://api.coindesk.com/v1/bpi/historical/close.json?'
-               %  utils.encode_args(kwargs))
+               % utils.encode_args(kwargs))
         ret = requests.get(uri)
         return utils.parse_json(ret)
 

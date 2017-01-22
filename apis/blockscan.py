@@ -1,6 +1,6 @@
 import requests
 import json
-#import utils
+from ifo import utils
 
 
 class Blockscan:

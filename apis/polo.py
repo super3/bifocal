@@ -1,8 +1,8 @@
 import requests
-#import utils
 import hmac
 import hashlib
 import time
+from ifo import utils
 
 
 class Polo:

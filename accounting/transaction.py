@@ -61,9 +61,9 @@ class Transaction:
     def zero(self):
         return self.quantity == 0
 
-    def copy(self, quantity=none):
+    def copy(self, quantity=None):
         return Transaction(
-            self.timestamp
+            self.timestamp,
             quantity or self.quantity,
             self.price,
             self.asset

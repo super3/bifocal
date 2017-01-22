@@ -24,14 +24,14 @@ def timestamp_floor(timestamp):
     return timestamp / 86400 * 86400
 
 
-def parse_json(self, ret):
+def parse_json(ret):
     """
     Return a dictionary from a requests response
     """
     return json.loads(ret.text)
 
 
-def encode_args(self, args_dict):
+def encode_args(args_dict):
     """
     Encode a dictionary for url encoding. Example: 'key=val&key2=val2'
     """

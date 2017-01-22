@@ -28,6 +28,8 @@
 #
 # (See http://opensource.org/licenses/BSD-2-Clause)
 
+from acc import IFO
+
 
 class FIFO(IFO):
 
