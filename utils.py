@@ -36,7 +36,7 @@ def encode_args(args_dict):
     Encode a dictionary for url encoding. Example: 'key=val&key2=val2'
     """
     encoded = ''
-    for key, value in args_dics.iteritems():
+    for key, value in args_dict.iteritems():
         encoded += "%s=%s&" % (key, value)
     return encoded[:-1]
 
