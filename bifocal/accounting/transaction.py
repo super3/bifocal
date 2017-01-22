@@ -38,7 +38,7 @@ class Transaction:
         self.asset = asset
 
     def __repr__(self):
-        return "%s: %s%s @ %s" % (
+        return "%s: %s %s @ %s" % (
             self.timestamp,
             self.quantity,
             self.price,

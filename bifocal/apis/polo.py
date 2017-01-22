@@ -73,7 +73,7 @@ class Polo:
 
         raise ValueError('No price found.')
 
-    def get_deposit_addresses_by_currency(self, currency, start, end):
+    def get_deposit_addresses_by_asset(self, currency, start, end):
         addresses = []
         deposits = self._get_deposits_and_withdrawals(start, end)
 
