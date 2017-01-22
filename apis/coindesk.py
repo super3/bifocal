@@ -13,7 +13,7 @@ class Coindesk:
         self._chart = self._ret['bpi']
 
     def _request(self, **kwargs):
-        uri = ('http(s)://api.coindesk.com/v1/bpi/historical/close.json?'
+        uri = ('https://api.coindesk.com/v1/bpi/historical/close.json?%s'
                % utils.encode_args(kwargs))
         ret = requests.get(uri)
         return utils.parse_json(ret)
