@@ -12,5 +12,3 @@ class Wallet:
             self._current = 0
             raise StopIteration
         return self._addresses[self._current - 1]
-
-    
