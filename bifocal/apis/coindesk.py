@@ -1,6 +1,6 @@
 import requests
 import json
-from ifo import utils
+from bifocal import utils
 
 
 class Coindesk:

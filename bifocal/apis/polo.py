@@ -2,7 +2,7 @@ import requests
 import hmac
 import hashlib
 import time
-from ifo import utils
+from bifocal import utils
 
 
 class Polo:

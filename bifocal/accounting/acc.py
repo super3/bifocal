@@ -29,7 +29,7 @@
 # (See http://opensource.org/licenses/BSD-2-Clause)
 
 import datetime
-from ifo import utils
+from bifocal import utils
 from collections import deque
 from transaction import Transaction
 
