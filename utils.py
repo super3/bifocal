@@ -3,17 +3,18 @@ import datetime
 import json
 
 
-def get_address_transactions(address, asset):
-    pass
-
-
-def datetime_to_timestamp(date, format):
+def date_to_timestamp(date, form):
     """
     Parse a UTC timestamp from a datetime string to a utc timestamp int
     """
-    time = datetime.strptime(date, format)
+    time = datetime.strptime(date, form)
     timestamp = calendar.timegm(time.utctimetuple())
     return timestamp
+
+
+def timestamp_to_date(timestamp, form):
+    date = datetime.datetime.utcfromtimestamp(timestamp)
+    return date.strftime(form)
 
 
 def timestamp_floor(timestamp):
@@ -27,8 +28,7 @@ def parse_json(self, ret):
     """
     Return a dictionary from a requests response
     """
-    ret_json = json.loads(ret.text)
-    return ret_json
+    return json.loads(ret.text)
 
 
 def encode_args(self, args_dict):
