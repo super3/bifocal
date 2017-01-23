@@ -42,10 +42,6 @@ class Blockchain:
         output_addresses = self._clean_outputs(outputs)
 
         transactions = []
-        print 'inputs'
-        print input_addresses
-        print 'outputs'
-        print output_addresses
 
         for input_addr, in_value in input_addresses.iteritems():
             proportion = float(in_value) / total_inputs
@@ -81,7 +77,6 @@ class Blockchain:
     def _clean_outputs(self, outputs):
         output_addresses = {}
         for o in outputs:
-            print o
             if 'addr' not in o or int(o['value']) == 0:
                 continue
             addr = o['addr']

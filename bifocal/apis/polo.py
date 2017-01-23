@@ -11,7 +11,7 @@ class Polo:
     def __init__(self, api_key, secret):
         self._api_key = api_key
         self._secret = secret
-        self._charts = {}
+        self._cache = {}
         self._coindesk = Coindesk()
 
     def _make_public_request(self, **kwargs):
@@ -39,7 +39,7 @@ class Polo:
             command='returnTradeHistory',
             currencyPair=currency_pair,
             start=0,
-            end=9999999999999
+            end=9999999999
         )
 
         history = map(self._parse_tx, history)
@@ -72,7 +72,7 @@ class Polo:
             price_in_btc=btc_price,
             timestamp=stamp,
             source='polo',
-            destionation='polo'
+            destination='polo'
         )
 
     def _get_chart_data(self, currency_pair, start, end, period):
@@ -84,39 +84,82 @@ class Polo:
             period=period
         )
 
-    def _get_deposits_and_withdrawals(self, start, end):
-        return self._make_private_request(
-            command='returnDepositsWithdrawals',
-            start=start,
-            end=end
+    def _get_deposits_and_withdrawals(self):
+        if 'movements' not in self._cache:
+            self._cache['movements'] = self._make_private_request(
+                command='returnDepositsWithdrawals',
+                start=0,
+                end=9999999999
+            )
+
+        return self._cache['movements']
+
+    def get_deposits_and_withdrawals(self, asset):
+        data = self._get_deposits_and_withdrawals()
+
+        deposits = filter(
+            lambda k: k.asset == asset,
+            map(_parse_deposit, data['deposits'])
+        )
+        withdrawals = filter(
+            lambda k: k.asset == asset,
+            map(_parse_withdrawal, data['withdrawals'])
+        )
+
+        return deposits, withdrawals
+
+    def _parse_deposit(self, deposit):
+        asset = deposit['currency']
+        stamp = deposit['timestamp']
+        btc_in_usd = self._coindesk.get_price_by_timestamp(stamp)
+        if asset != 'BTC':
+            asset_in_btc = self.get_daily_close_price('BTC_%s' % asset, stamp)
+            price = asset_in_btc * btc_in_usd
+        else:
+            price = btc_in_usd
+        return models.Transaction(
+            quantity=float(deposit['amount']),
+            asset=deposit['currency'],
+            price=price,
+            id=deposit['txid'],
+            timestamp=stamp,
+            destination='polo'
+        )
+
+    def _parse_withdrawal(self, withdrawal):
+        asset = withdrawal['currency']
+        stamp = withdrawal['timestamp']
+        btc_in_usd = self._coindesk.get_price_by_timestamp(stamp)
+        if asset != 'BTC':
+            asset_in_btc = self.get_daily_close_price('BTC_%s' % asset, stamp)
+            price = asset_in_btc * btc_in_usd
+        else:
+            price = btc_in_usd
+        return models.Transaction(
+            quantity=float(withdrawal['amount']),
+            asset=withdrawal['currency'],
+            price=price,
+            id=withdrawal['txid'],
+            timestamp=stamp,
+            source='polo',
+            destination=withdrawal['address']
         )
 
     def get_daily_close_price(self, currency_pair, timestamp):
         timestamp = utils.timestamp_floor(timestamp)
 
-        if currency_pair not in self._charts:
-            self._charts[currency_pair] = self._get_chart_data(
+        if currency_pair not in self._cache:
+            self._cache[currency_pair] = self._get_chart_data(
                 currency_pair,
                 0,
                 9999999999,
                 86400
             )
 
-        chart = self._charts[currency_pair]
+        chart = self._cache[currency_pair]
 
         for row in chart:
             if row['date'] == timestamp:
                 return float(row['close'])
 
         raise ValueError('No price found.')
-
-    def get_deposit_addresses_by_asset(self, currency, start, end):
-        addresses = []
-        deposits = self._get_deposits_and_withdrawals(start, end)
-
-        for deposit in deposits['deposits']:
-            if deposit['currency'] == currency:
-                if deposit['address'] not in addresses:
-                    addresses.append(deposit['address'])
-
-        return addresses

@@ -41,9 +41,5 @@ def encode_args(args_dict):
     return encoded[:-1]
 
 
-def sort_by_timestamp(transactions):
-    return sorted(transactions, key=lambda k: k.timestamp)
-
-
 def flatten(l):
     return [i for s in l for i in s]
