@@ -31,11 +31,12 @@
 
 class Transaction:
 
-    def __init__(self, timestamp, quantity, price, asset):
+    def __init__(self, timestamp, quantity, asset, **kwargs):
         self.quantity = quantity
-        self.price = price
+        self.price = kwargs.price if price in kwargs else None
         self.timestamp = timestamp
         self.asset = asset
+        self.data = kwargs
 
     def __repr__(self):
         return "%s: %s %s @ %s" % (

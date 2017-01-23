@@ -2,7 +2,7 @@ import requests
 import hmac
 import hashlib
 import time
-from bifocal import utils
+from bifocal import utils, models
 
 
 class Polo:
@@ -33,9 +33,20 @@ class Polo:
         return utils.parse_json(ret)
 
     def get_trade_history(self, currency_pair):
-        return self._make_private_request(
+        history = self._make_private_request(
             command='returnTradeHistory',
             currencyPair=currency_pair
+        )
+
+        return utils.flatten(map(self._parse_tx, history))
+
+    def _parse_tx(tx, currency_pair):
+        return models.Transaction(
+            quantity=float(tx['amount']),
+            price=float(tx['rate']),
+            asset=currency_pair,
+            id=tx['globalTradeID'],
+            timestamp=utils.date_to_timestamp(tx['date'], '%Y-%m-%d  %H:%M:%S')
         )
 
     def _get_chart_data(self, currency_pair, start, end, period):
