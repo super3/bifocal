@@ -15,7 +15,9 @@ class Bifocal():
         self._blockchain = apis.Blockchain()
 
         self._assets = assets
-        self._transactions = {}
+        self._transaction_lists = {}
+        for asset in asset:
+            self._transaction_lists['asset'] = []
 
         self._addresses = addresses
         self._add_exchange_addresses()
@@ -35,20 +37,41 @@ class Bifocal():
         self._addresses += set(addresses) - set(self._addresses)
 
     def _add_exchange_sales(self):
-        pass
+        self._add_polo_sales()
+
+    def _add_polo_sales(self):
+        for asset in self._assets:
+            if asset != 'BTC':
+                # assumes all non-btc assets are paired to BTC
+                txs, counter_txs = self._polo.get_trade_history("BTC_" + asset)
+                self._transaction_lists[asset] += txs
+                self._transaction_lists['BTC'] += counter_txs
 
     def make_transaction_lists(self):
         for asset in self._assets:
-            self._transactions[asset] = utils.flatten(map(
-                lambda a: self._blockscan.get_address_transactions(a, asset),
-                self.wallet
-            ))
-        self._transactions[asset] = utils.flatten(map(
+            if asset != 'BTC':
+                self._transaction_lists[asset] += map(
+                    (lambda a:
+                     self._blockscan.get_address_transactions(a, asset)),
+                    self.wallet
+                )
+        self._transaction_lists['BTC'] += utils.flatten(map(
             lambda a: self._blockchain.get_address_transactions(a)
         ))
         self._add_exchange_sales()
-        self._add_prices()
+        self._filter_transactions()
+        self._sort_transactions()
 
-    def _add_prices(self):
+    def _sort_transactions(self):
         for asset in assets:
             pass
+
+    def _sort_tx_list(self):
+        pass
+
+    def _filter_transactions(self):
+        for asset in assets:
+            pass
+
+    def _filter_tx_list(self, list):
+        pass

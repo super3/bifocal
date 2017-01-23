@@ -29,9 +29,9 @@
 # (See http://opensource.org/licenses/BSD-2-Clause)
 
 import datetime
-from bifocal import utils
 from collections import deque
-from transaction import Transaction
+from bifocal import utils
+from bifocal.models import Transaction
 
 
 class IFO():

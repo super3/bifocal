@@ -32,9 +32,9 @@
 class Transaction:
 
     def __init__(self, timestamp, quantity, asset, **kwargs):
-        self.quantity = quantity
-        self.price = kwargs.price if price in kwargs else None
-        self.timestamp = timestamp
+        self.quantity = float(quantity)
+        self.price = float(kwargs['price'] if 'price' in kwargs else None)
+        self.timestamp = int(timestamp)
         self.asset = asset
         self.data = kwargs
 
@@ -42,9 +42,12 @@ class Transaction:
         return "%s: %s %s @ %s" % (
             self.timestamp,
             self.quantity,
-            self.price,
-            self.asset
+            self.asset,
+            self.price
         )
+
+    def invert_quantity(self):
+        self.quantity = self.quantity * -1
 
     @property
     def size(self):

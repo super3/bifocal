@@ -1,12 +1,16 @@
 import requests
 import json
 from bifocal import utils, models
+from polo import Polo
+from coindesk import Coindesk
 
 
 class Blockscan:
 
     def __init__(self):
         self._transactions = {}
+        self._polo = Polo(None, None)
+        self._coindesk = Coindesk()
 
     def _request(self, **kwargs):
         uri = 'http://xcp.blockscan.com/api2?%s' % utils.encode_args(kwargs)
@@ -29,24 +33,29 @@ class Blockscan:
             btc_address=address,
             asset=asset
         )
-        transactions = data['txs']
+        transactions = data['data']
         return map(self._parse_tx, transactions)
 
     def get_tx_source(self, txid):
         tx = self.get_tx_by_id(txid)
-        return tx['data']['source']
+        return tx['data'][0]['source']
 
     def get_tx_destination(self, txid):
         tx = self.get_tx_by_id(txid)
-        return tx['data']['destination']
+        return tx['data'][0]['destination']
 
     def _parse_tx(self, tx):
-        mod = -1 if tx['type'] == 'DEBIT' else 1
+        sign = -1 if tx['type'] == 'DEBIT' else 1
+        stamp = int(tx['block_time'])
+        pair = "BTC_%s" % tx['asset']
+        btc_rate = self._polo.get_daily_close_price(pair, stamp)
         return models.Transaction(
-            timestamp=int(tx['timestamp']),
-            quantity=mod * int(tx['quantity']) / 100000000,
+            timestamp=stamp,
+            quantity=int(tx['quantity']) / 100000000 * sign,
             asset=tx['asset'],
             id=tx['event'],
-            source=get_tx_source(tx['event']),
-            destination=get_tx_destination(tx['event'])
+            price=btc_rate * self._coindesk.get_price_by_timestamp(stamp),
+            price_in_btc=btc_rate,
+            source=self.get_tx_source(tx['event']),
+            destination=self.get_tx_destination(tx['event'])
         )

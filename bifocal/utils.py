@@ -1,5 +1,5 @@
 import calendar
-import datetime
+from datetime import datetime
 import json
 
 
@@ -13,7 +13,7 @@ def date_to_timestamp(date, form):
 
 
 def timestamp_to_date(timestamp, form):
-    date = datetime.datetime.utcfromtimestamp(timestamp)
+    date = datetime.utcfromtimestamp(timestamp)
     return date.strftime(form)
 
 

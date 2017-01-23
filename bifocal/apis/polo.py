@@ -3,6 +3,7 @@ import hmac
 import hashlib
 import time
 from bifocal import utils, models
+from coindesk import Coindesk
 
 
 class Polo:
@@ -11,6 +12,7 @@ class Polo:
         self._api_key = api_key
         self._secret = secret
         self._charts = {}
+        self._coindesk = Coindesk()
 
     def _make_public_request(self, **kwargs):
         uri = 'https://poloniex.com/public?%s' % utils.encode_args(kwargs)
@@ -35,18 +37,42 @@ class Polo:
     def get_trade_history(self, currency_pair):
         history = self._make_private_request(
             command='returnTradeHistory',
-            currencyPair=currency_pair
+            currencyPair=currency_pair,
+            start=0,
+            end=9999999999999
         )
 
-        return utils.flatten(map(self._parse_tx, history))
+        history = map(self._parse_tx, history)
 
-    def _parse_tx(tx, currency_pair):
+        counter_trades = []
+        for tx in history:
+            tx.asset = currency_pair.split('_')[1]
+            counter_trades.append(models.Transaction(
+                quantity=tx.quantity * tx.data['price_in_btc'] * -1,
+                asset=currency_pair.split('_')[0],
+                id=tx.data['id'],
+                timestamp=tx.timestamp,
+                source='polo',
+                destination='polo',
+                price=self._coindesk.get_price_by_timestamp(tx.timestamp)
+            ))
+
+        return history, counter_trades
+
+    def _parse_tx(self, tx):
+        mod = -1 if tx['type'] == 'sell' else 1
+        stamp = utils.date_to_timestamp(tx['date'], '%Y-%m-%d  %H:%M:%S')
+        btc_price = float(tx['rate'])
+
         return models.Transaction(
-            quantity=float(tx['amount']),
-            price=float(tx['rate']),
-            asset=currency_pair,
+            quantity=float(tx['amount']) * mod,
+            asset=None,
+            price=btc_price * self._coindesk.get_price_by_timestamp(stamp),
             id=tx['globalTradeID'],
-            timestamp=utils.date_to_timestamp(tx['date'], '%Y-%m-%d  %H:%M:%S')
+            price_in_btc=btc_price,
+            timestamp=stamp,
+            source='polo',
+            destionation='polo'
         )
 
     def _get_chart_data(self, currency_pair, start, end, period):
