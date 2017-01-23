@@ -74,3 +74,6 @@ class Bifocal:
         if tx.data['destination'] == 'polo' or tx.data['source'] == 'polo':
             return True
         return False
+
+    def make_asset_results(self):
+        for asset in assets

@@ -28,7 +28,7 @@
 #
 # (See http://opensource.org/licenses/BSD-2-Clause)
 
-from acc import IFO
+from ifo import IFO
 
 
 class LIFO(IFO):
