@@ -69,6 +69,6 @@ class Transaction:
         return Transaction(
             self.timestamp,
             quantity or self.quantity,
-            self.price,
-            self.asset
+            self.asset,
+            **self.data
         )

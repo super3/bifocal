@@ -17,10 +17,12 @@ class Bifocal:
         self._transaction_lists = {}
         for asset in self._assets:
             self._transaction_lists[asset] = []
+        self.results = {}
 
         self.wallet = models.Wallet(addresses)
 
         self.make_transaction_lists()
+        self.make_asset_results()
 
     def _add_addresses(self, addresses):
         self._addresses += set(addresses) - set(self._addresses)
@@ -76,4 +78,8 @@ class Bifocal:
         return False
 
     def make_asset_results(self):
-        for asset in assets
+        for asset in self._assets:
+            self.results[asset] = {
+                'FIFO': accounting.FIFO(self._transaction_lists[asset]),
+                'LIFO': accounting.LIFO(self._transaction_lists[asset])
+            }

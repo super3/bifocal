@@ -36,18 +36,17 @@ from bifocal.models import Transaction
 
 class IFO():
 
-    def __init__(self, entries=None):
+    def __init__(self, transactions=None):
         self._started_at = datetime.datetime.now()
         self._finished_at = None
 
-        self._entries = entries or []
+        self._transactions = transactions or []
 
         self._balance = 0
         self.inventory = deque()
         self.trace = []
         self._gains = 0.0
 
-        self._entires = utils.sort_by_timestamp(self._entries)
         self._compute()
 
     @property
@@ -100,3 +99,6 @@ class IFO():
                 self._fill(transaction)
 
         self._finished_at = datetime.datetime.now()
+
+    def __repr__(self):
+        pass
