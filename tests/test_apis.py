@@ -1,22 +1,48 @@
 from unittest import TestCase
 import mock
 
-from bifocal import apis, utils
+import bifocal
 
 
 class TestBlocktrail(TestCase):
 
     def setUp(self):
-        self.blocktrail = apis.Blocktrail('test')
+        patcher = mock.patch('bifocal.apis.blocktrail.Coindesk')
+        self.addCleanup(patcher.stop)
+        self.mock_coindesk = patcher.start()
+
+        self.bt = bifocal.apis.Blocktrail('test')
 
     def tearDown(self):
         pass
 
     def test_init(self):
-        pass
+        self.assertEqual(self.bt._key, 'test')
+        self.assertEqual(self.bt._chart,
+                         self.mock_coindesk.get_chart.return_value)
 
-    def test_request(self):
-        pass
+    @mock.patch('bifocal.apis.blocktrail.utils')
+    @mock.patch('bifocal.apis.blocktrail.requests')
+    def test_request(self, mock_requests, mock_utils):
+        route = 'addresses'
+        kwargs = {
+            'nonce': '17',
+            'test': 'yes'
+        }
+
+        ret = '{"return": "certainly"}'
+        mock_requests.get.return_value = ret
+        encoded_kwargs = 'return=certainly'
+        mock_utils.encode_args.return_value = encoded_kwargs
+
+        self.bt._request(route, **kwargs)
+
+        uri = ('https://api.blocktrail.com/v1/btc/%s?api_key=%s&%s'
+               % (route, self.bt._key, encoded_kwargs))
+
+        mock_utils.encode_args.assert_called_with(kwargs)
+        mock_requests.get.assert_called_with(uri)
+        mock_utils.parse_json.assert_called_with(ret)
 
     def test_get_address_transactions(self):
         pass
