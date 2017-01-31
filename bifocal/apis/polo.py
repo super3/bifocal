@@ -103,7 +103,7 @@ class Polo:
             total=tx['total']
         )
 
-    def _get_deposits_and_withdrawals(self):
+    def _deposits_and_withdrawals(self):
         if 'movements' not in self._cache:
             self._cache['movements'] = self._make_private_request(
                 command='returnDepositsWithdrawals',
@@ -114,7 +114,7 @@ class Polo:
         return self._cache['movements']
 
     def get_deposits_and_withdrawals(self, asset):
-        data = self._get_deposits_and_withdrawals()
+        data = self._deposits_and_withdrawals()
 
         deposits = filter(
             lambda k: k.asset == asset,
