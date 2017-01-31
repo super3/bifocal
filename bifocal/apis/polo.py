@@ -156,7 +156,7 @@ class Polo:
         else:
             price = btc_in_usd
         return models.Transaction(
-            quantity=float(withdrawal['amount']) * 100000000,
+            quantity=int(float(withdrawal['amount']) * 100000000),
             asset=withdrawal['currency'],
             price=price,
             id=withdrawal['txid'],
