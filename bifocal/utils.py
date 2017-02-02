@@ -13,6 +13,9 @@ def date_to_timestamp(date, form):
 
 
 def timestamp_to_date(timestamp, form):
+    """
+    Return a date string from a timestamp
+    """
     date = datetime.utcfromtimestamp(timestamp)
     return date.strftime(form)
 
@@ -42,4 +45,7 @@ def encode_args(args_dict):
 
 
 def flatten(l):
+    """
+    Flatten a list of lists
+    """
     return [i for s in l for i in s]

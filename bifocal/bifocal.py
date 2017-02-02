@@ -5,6 +5,7 @@ import utils
 
 # TODO: Get Polo deposit/withdrawals.
 # Crawl transactions and filter out those ones by txid
+# TODO: Check TX quantity signs
 
 
 class Bifocal:
@@ -73,7 +74,6 @@ class Bifocal:
             return True
         if tx.data['destination'] in self.wallets:
             return True
-        # TODO: Is this broken?
         if tx.data['destination'] == 'polo' and tx.data['source'] == 'polo':
             return True
         return False

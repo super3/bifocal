@@ -1,6 +1,6 @@
 import requests
 from bifocal import utils
-from datetime import datetime
+from datetime import date
 
 
 class Coindesk:
@@ -26,10 +26,10 @@ class Coindesk:
         return float(utils.parse_json(ret)['bpi']['USD']['rate'])
 
     @staticmethod
-    def get_price_by_date(date):
-        if date == datetime.today().date().strftime("%Y-%m-%d"):
+    def get_price_by_date(date_string):
+        if date_string == date.today().strftime("%Y-%m-%d"):
             return Coindesk._get_price_today()
-        return Coindesk._get_date(date)
+        return Coindesk._get_date(date_string)
 
     @staticmethod
     def get_price_by_timestamp(timestamp):

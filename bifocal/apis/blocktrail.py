@@ -36,7 +36,6 @@ class Blocktrail:
                 page=page
             )
             tx_list += [self._parse_tx(tx, address) for tx in data['data']]
-            pass
 
         return utils.flatten(tx_list)
 
@@ -51,23 +50,26 @@ class Blocktrail:
         stamp = utils.date_to_timestamp(tx['time'].split('+')[0],
                                         '%Y-%m-%dT%H:%M:%S')
         date = utils.timestamp_to_date(stamp, '%Y-%m-%d')
-        try:
+
+        if date in self._chart:
             price = self._chart[date]
-        except KeyError:
+        else:
             price = Coindesk.get_price_by_timestamp(stamp)
 
+        # How do qunatity??????
         for in_addr, in_value in inputs.iteritems():
             proportion = float(in_value) / total_inputs
-            transactions.append(models.Transaction(
-                timestamp=stamp,
-                quantity=int(round(fee * proportion)),
-                asset='BTC',
-                price=price,
-                id=tx['hash'],
-                source=in_addr,
-                destination='fee',
 
-            ))
+            if in_addr == address:
+                transactions.append(models.Transaction(
+                    timestamp=stamp,
+                    quantity=int(round(fee * proportion)),
+                    asset='BTC',
+                    price=price,
+                    id=tx['hash'],
+                    source=in_addr,
+                    destination='fee',))
+
             for out_addr, out_value in outputs.iteritems():
                 if address not in [in_addr, out_addr]:
                     continue

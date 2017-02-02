@@ -45,6 +45,22 @@ class Transaction:
         if type(self.timestamp) is not int:
             raise ValueError('Invalid timestamp: %s' % self.timestamp)
 
+    def __eq__(self, other):
+        for key, value in self.data.iteritems():
+            if key not in other.data:
+                return False
+            if value != other.data[key]:
+                return False
+        if self.quantity != other.quantity:
+            return False
+        if self.price != other.price:
+            return False
+        if self.timestamp != other.timestamp:
+            return False
+        if self.asset != other.asset:
+            return False
+        return True
+
     def __repr__(self):
         return "%s: %s %s @ %s" % (
             self.timestamp,
