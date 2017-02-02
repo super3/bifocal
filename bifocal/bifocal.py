@@ -10,33 +10,17 @@ import utils
 
 class Bifocal:
 
-    def __init__(self, wallets={}, polo_key=None, polo_secret=None):
-        self._transaction_lists = {}
-        self.wallets = wallets
+    def __init__(self, addresses={}, polo_key=None, polo_secret=None):
 
+        self.wallets = {}
         self._polo = apis.Polo(polo_key, polo_secret)
+        self.results = {}
 
         for asset in self.wallets:
-            self._transaction_lists[asset] = []
-            self.wallets[asset] = models.Wallet(self.wallets[asset])
-        self.results = {}
+            self.wallets[asset] = models.Wallet(addresses[asset])
 
         self.make_transaction_lists()
         self.make_asset_results()
-
-    def _add_addresses(self, addresses, asset):
-        self.wallets[asset] += set(addresses) - set(self.wallets[asset])
-
-    def _add_exchange_sales(self):
-        self._add_polo_sales()
-
-    def _add_polo_sales(self):
-        for asset in self.wallet:
-            if asset != 'BTC':
-                # assumes all non-btc assets are paired to BTC
-                txs, counter_txs = self._polo.get_trade_history('BTC_' + asset)
-                self._transaction_lists[asset] += txs
-                self._transaction_lists['BTC'] += counter_txs
 
     def make_transaction_lists(self):
         for asset in self.wallets:
@@ -47,36 +31,32 @@ class Bifocal:
                     self.wallets[asset]
                 ))
         self._transaction_lists['BTC'] += utils.flatten(map(
-            lambda a: Blockchain.get_address_transactions(a),
+            lambda a: Blocktail.get_address_transactions(a),
             self.wallets[asset]
         ))
-        self._add_exchange_sales()
-        self._filter_transactions()
-        self._sort_transactions()
 
-    def _sort_transactions(self):
+        self._add_polo_sales()
+        self._add_blacklists()
+
         for asset in self.wallets:
-            self._transaction_lists[asset] = sorted(
-                self._transaction_lists[asset],
-                key=lambda k: k.timestamp
-            )
+            self.wallets[asset].check_tx_list()
 
-    def _filter_transactions(self):
+    def _add_polo_sales(self):
         for asset in self.wallets:
-            self._transaction_lists[asset] = filter(
-                self._tx_filter,
-                self._transaction_lists[asset]
-            )
+            if asset != 'BTC':
+                # assumes all non-btc assets are paired to BTC
+                # each transaction is paired with a counter tx
+                # I.e. every sale of SJCX is also a purchase of BTC
+                txs, counter_txs = self._polo.get_trade_history(
+                    'BTC_' + asset)
+                self.wallets[asset].add_transactions(txs)
+                self.wallets['BTC'].add_transactions(counter_txs)
 
-    def _tx_filter(self, tx):
-        addresses = [entry for k, v in self.wallets.iteritems() for entry in v]
-        if tx.data['source'] in self.wallets:
-            return True
-        if tx.data['destination'] in self.wallets:
-            return True
-        if tx.data['destination'] == 'polo' and tx.data['source'] == 'polo':
-            return True
-        return False
+    def _add_blacklists(self):
+        for asset in self.wallets:
+            dep, withs = self._polo.get_deposits_and_withdrawls(asset)
+            blacklist = [tx.data['id'] for tx in deps + withs]
+            self.wallets.add_blacklist_ids(blacklist)
 
     def make_asset_results(self):
         for asset in self._assets:

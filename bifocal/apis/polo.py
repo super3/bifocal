@@ -118,12 +118,10 @@ class Polo:
 
         deposits = filter(
             lambda k: k.asset == asset,
-            map(_parse_deposit, data['deposits'])
-        )
+            map(self._parse_deposit, data['deposits']))
         withdrawals = filter(
             lambda k: k.asset == asset,
-            map(_parse_withdrawal, data['withdrawals'])
-        )
+            map(self._parse_withdrawal, data['withdrawals']))
 
         return deposits, withdrawals
 
@@ -159,7 +157,7 @@ class Polo:
             quantity=int(float(withdrawal['amount']) * 100000000),
             asset=withdrawal['currency'],
             price=price,
-            id=withdrawal['txid'],
+            id=withdrawal['status'][10],
             timestamp=stamp,
             source='polo',
             destination=withdrawal['address']
