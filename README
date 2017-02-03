@@ -9,18 +9,18 @@ Goals:
 
 Will Support:
 Bitcoin
-Counterparty
+Counterparty tokens traded against Bitcoin
 Poloniex
 
 Might support:
-Ethereum
+Ethereum and ERC20 tokens
 Other exchanges
 
 Unsolved problems:
 Counterparty block explorer APIs only return the most recent 100 transactions for an address.
 
 
-Credit for much of the calculation code goes to https://github.com/vst/accfifo
+Credit for much of the accounting code goes to https://github.com/vst/accfifo
 His code is released under the BSD License, and files containing it include the license text.
 
 All other code released under AGPLv3.

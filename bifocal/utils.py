@@ -1,6 +1,7 @@
 import calendar
 from datetime import datetime
 import json
+import math
 
 
 def date_to_timestamp(date, form):
@@ -49,3 +50,35 @@ def flatten(l):
     Flatten a list of lists
     """
     return [i for s in l for i in s]
+
+
+def distribute(inputs, outputs):
+    """
+    Builds a nested dictionary assigning inputs to outputs.
+    """
+    total_inputs = sum(inputs[key] for key in inputs)
+    total_outputs = sum(outputs[key] for key in outputs)
+    fee = total_inputs - total_outputs
+
+    tx_map = {}
+
+    for i, in_val in inputs.iteritems():
+        txns = {}
+        proportion = float(in_val) / total_inputs
+
+        for o, out_val in outputs.iteritems():
+            value = int(math.floor(out_val * proportion))
+            txns[o] = value
+
+        txns['fee'] = int(math.floor(fee * proportion))
+
+        missing_value = in_val - sum(txns[k] for k in txns)
+        for key, value in txns.iteritems():
+            value += 1
+            missing_value -= 1
+            if missing_value == 0:
+                break
+
+        tx_map[i] = txns
+
+    return tx_map

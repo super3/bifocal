@@ -3,64 +3,55 @@ import apis
 import accounting
 import utils
 
-# TODO: Get Polo deposit/withdrawals.
-# Crawl transactions and filter out those ones by txid
-# TODO: Check TX quantity signs
-
 
 class Bifocal:
 
-    def __init__(self, addresses={}, polo_key=None, polo_secret=None):
+    def __init__(self, addresses={}, polo_key=None,
+                 polo_secret=None, blocktrail_key=None):
 
         self.wallets = {}
         self._polo = apis.Polo(polo_key, polo_secret)
+        self._blocktrail = apis.Blocktrail(blocktrail_key)
         self.results = {}
-
-        for asset in self.wallets:
+        for asset in addresses:
             self.wallets[asset] = models.Wallet(addresses[asset])
+            self._make_transaction_lists(asset)
+            self._add_polo_sales(asset)
+            self._add_blacklists(asset)
+            self.wallets[asset].finalize_tx_list()
+            self._make_asset_results(asset)
 
-        self.make_transaction_lists()
-        self.make_asset_results()
+    def _make_transaction_lists(self, asset):
+        if asset == 'BTC':
+            self.wallets[asset].add_transactions(utils.flatten(map(
+                self._blocktrail.get_address_transactions,
+                self.wallets[asset].addresses)))
+        else:
+            self.wallets[asset].add_transactions(utils.flatten(map(
+                (lambda a: apis.Blockscan.get_address_transactions(a, asset)),
+                self.wallets[asset].addresses)))
 
-    def make_transaction_lists(self):
-        for asset in self.wallets:
-            if asset != 'BTC':
-                self._transaction_lists[asset] += utils.flatten(map(
-                    (lambda a:
-                     Blockscan.get_address_transactions(a, asset)),
-                    self.wallets[asset]
-                ))
-        self._transaction_lists['BTC'] += utils.flatten(map(
-            lambda a: Blocktail.get_address_transactions(a),
-            self.wallets[asset]
-        ))
+    def _add_polo_sales(self, asset):
+        if asset != 'BTC':
+            # assumes all non-btc assets are paired to BTC
+            # each transaction is paired with a counter tx
+            # I.e. every sale of SJCX is also a purchase of BTC
+            txs, counter_txs = self._polo.get_trade_history(
+                'BTC_' + asset)
+            self.wallets[asset].add_transactions(txs)
+            self.wallets['BTC'].add_transactions(counter_txs)
 
-        self._add_polo_sales()
-        self._add_blacklists()
+    def _add_blacklists(self, asset):
+        deps, withs = self._polo.get_deposits_and_withdrawals(asset)
+        blacklist = [tx.data['id'] for tx in deps + withs]
+        self.wallets[asset].add_blacklist_ids(blacklist)
 
-        for asset in self.wallets:
-            self.wallets[asset].check_tx_list()
-
-    def _add_polo_sales(self):
-        for asset in self.wallets:
-            if asset != 'BTC':
-                # assumes all non-btc assets are paired to BTC
-                # each transaction is paired with a counter tx
-                # I.e. every sale of SJCX is also a purchase of BTC
-                txs, counter_txs = self._polo.get_trade_history(
-                    'BTC_' + asset)
-                self.wallets[asset].add_transactions(txs)
-                self.wallets['BTC'].add_transactions(counter_txs)
-
-    def _add_blacklists(self):
-        for asset in self.wallets:
-            dep, withs = self._polo.get_deposits_and_withdrawls(asset)
-            blacklist = [tx.data['id'] for tx in deps + withs]
-            self.wallets.add_blacklist_ids(blacklist)
-
-    def make_asset_results(self):
-        for asset in self._assets:
-            self.results[asset] = {
-                'FIFO': accounting.FIFO(self._transaction_lists[asset]),
-                'LIFO': accounting.LIFO(self._transaction_lists[asset])
-            }
+    def _make_asset_results(self, asset):
+        print self.wallets[asset].transactions
+        fifo = accounting.FIFO(self.wallets[asset].transactions)
+        print self.wallets[asset].transactions
+        lifo = accounting.LIFO(self.wallets[asset].transactions)
+        print self.wallets[asset].transactions
+        self.results[asset] = {
+            'FIFO': fifo,
+            'LIFO': lifo}

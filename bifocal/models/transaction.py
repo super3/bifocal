@@ -61,6 +61,9 @@ class Transaction:
             return False
         return True
 
+    def __hash__(self):
+        return hash(repr(self))
+
     def __repr__(self):
         return "%s: %s %s @ %s" % (
             self.timestamp,
@@ -95,3 +98,6 @@ class Transaction:
             self.asset,
             **self.data
         )
+
+    def finalize(self):
+        pass

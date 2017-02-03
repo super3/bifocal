@@ -36,11 +36,11 @@ from bifocal.models import Transaction
 
 class IFO():
 
-    def __init__(self, transactions=None):
+    def __init__(self, transactions=[]):
         self._started_at = datetime.datetime.now()
         self._finished_at = None
 
-        self._transactions = transactions or []
+        self._transactions = transactions
 
         self._balance = 0
         self.inventory = deque()
@@ -91,7 +91,7 @@ class IFO():
         self._balance += transaction.quantity
 
     def _compute(self):
-        for transaction in self._transactions:
+        for transaction in [tx.copy() for tx in self._transactions]:
             if ((self._balance >= 0 and transaction.buy)
                     or (self._balance <= 0 and transaction.sell)):
                 self._push(transaction)
@@ -101,4 +101,9 @@ class IFO():
         self._finished_at = datetime.datetime.now()
 
     def __repr__(self):
-        pass
+        return (self.__name__ + 'accounting('
+                + 'bal : %s  ' % self.balance
+                + 'gain: %s  ' % self._gains
+                + 'txns: %s  ' % len(self._transactions)
+                + 'trce: %s  ' % len(self.trace)
+                + ')  ')
