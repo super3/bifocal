@@ -17,8 +17,6 @@ class Wallet(object):
         self._sort_transactions()
         self._filter_transactions()
         self._check_transaction_signs()
-        for tx in self.transactions:
-            tx.finalize()
 
     def _sort_transactions(self):
         self.transactions = sorted(

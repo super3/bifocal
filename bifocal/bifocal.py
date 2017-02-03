@@ -6,7 +6,7 @@ import utils
 
 class Bifocal(object):
 
-    def __init__(self, addresses={}, polo_key=None,
+    def __init__(self, year=None, addresses={}, polo_key=None,
                  polo_secret=None, blocktrail_key=None):
 
         self.wallets = {}

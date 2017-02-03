@@ -96,8 +96,4 @@ class Transaction(object):
             self.timestamp,
             quantity or self.quantity,
             self.asset,
-            **self.data
-        )
-
-    def finalize(self):
-        pass
+            **self.data)
