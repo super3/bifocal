@@ -4,7 +4,7 @@ from polo import Polo
 from coindesk import Coindesk
 
 
-class Blockscan:
+class Blockscan(object):
 
     @staticmethod
     def _request(**kwargs):

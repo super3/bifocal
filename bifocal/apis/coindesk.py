@@ -3,7 +3,7 @@ from bifocal import utils
 from datetime import date
 
 
-class Coindesk:
+class Coindesk(object):
 
     @staticmethod
     def get_chart():

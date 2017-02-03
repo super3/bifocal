@@ -29,7 +29,7 @@
 # (See http://opensource.org/licenses/BSD-2-Clause)
 
 
-class Transaction:
+class Transaction(object):
 
     def __init__(self, timestamp, quantity, asset, **kwargs):
         self.quantity = quantity

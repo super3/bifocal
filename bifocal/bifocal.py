@@ -4,7 +4,7 @@ import accounting
 import utils
 
 
-class Bifocal:
+class Bifocal(object):
 
     def __init__(self, addresses={}, polo_key=None,
                  polo_secret=None, blocktrail_key=None):
@@ -47,11 +47,8 @@ class Bifocal:
         self.wallets[asset].add_blacklist_ids(blacklist)
 
     def _make_asset_results(self, asset):
-        print self.wallets[asset].transactions
         fifo = accounting.FIFO(self.wallets[asset].transactions)
-        print self.wallets[asset].transactions
         lifo = accounting.LIFO(self.wallets[asset].transactions)
-        print self.wallets[asset].transactions
         self.results[asset] = {
             'FIFO': fifo,
             'LIFO': lifo}

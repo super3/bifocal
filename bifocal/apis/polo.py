@@ -6,7 +6,7 @@ from bifocal import utils, models
 from coindesk import Coindesk
 
 
-class Polo:
+class Polo(object):
 
     def __init__(self, api_key, secret):
         self._api_key = api_key

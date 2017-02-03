@@ -3,7 +3,7 @@ from bifocal import utils, models
 from coindesk import Coindesk
 
 
-class Blocktrail:
+class Blocktrail(object):
 
     def __init__(self, key):
         self._key = key

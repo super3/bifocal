@@ -4,7 +4,7 @@ from coindesk import Coindesk
 from blockscan import Blockscan
 
 
-class Blockchain:
+class Blockchain(object):
 
     @staticmethod
     def _request(command, arg):

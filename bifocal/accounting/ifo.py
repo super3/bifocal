@@ -34,7 +34,7 @@ from bifocal import utils
 from bifocal.models import Transaction
 
 
-class IFO():
+class IFO(object):
 
     def __init__(self, transactions=[]):
         self._started_at = datetime.datetime.now()
@@ -101,8 +101,8 @@ class IFO():
         self._finished_at = datetime.datetime.now()
 
     def __repr__(self):
-        return (self.__name__ + 'accounting('
-                + 'bal : %s  ' % self.balance
+        return (type(self).__name__ + ' accounting('
+                + 'bal : %s  ' % self._balance
                 + 'gain: %s  ' % self._gains
                 + 'txns: %s  ' % len(self._transactions)
                 + 'trce: %s  ' % len(self.trace)

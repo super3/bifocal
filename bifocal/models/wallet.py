@@ -1,4 +1,4 @@
-class Wallet:
+class Wallet(object):
     def __init__(self, addresses, transactions=[], blacklist=[]):
         self.addresses = addresses
         self.transactions = transactions
@@ -36,7 +36,7 @@ class Wallet:
             return True
         if destination in self.addresses and source not in self.addresses:
             return True
-        if souce == 'polo' and destination == 'polo':
+        if source == 'polo' and destination == 'polo':
             return True
         return False
 
