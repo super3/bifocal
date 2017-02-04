@@ -7,10 +7,11 @@ Goals:
 * Provide spreadsheets detailing transactions and gains.
 * Provide choice of FIFO vs LIFO
 
-Will Support:z
+Will Support:
 Bitcoin
 Counterparty tokens traded against Bitcoin
 Poloniex
+Parsing Coinbase and other CSVs
 
 Might support:
 Ethereum and ERC20 tokens
@@ -24,3 +25,7 @@ Credit for much of the accounting code goes to https://github.com/vst/accfifo
 His code is released under the BSD License, and files containing it include the license text.
 
 All other code released under AGPLv3.
+
+
+# TODO:
+More tests
