@@ -55,7 +55,7 @@ class Blocktrail(object):
         else:
             price = Coindesk.get_price_by_timestamp(stamp)
 
-        for in_addr, in_value in inputs.iteritems():
+        for in_addr in inputs:
             if in_addr == address:
                 transactions.append(models.Transaction(
                     timestamp=stamp,
@@ -66,7 +66,7 @@ class Blocktrail(object):
                     source=in_addr,
                     destination='fee',))
 
-            for out_addr, out_value in outputs.iteritems():
+            for out_addr in outputs:
                 if address not in [in_addr, out_addr]:
                     continue
                 transactions.append(models.Transaction(
@@ -76,12 +76,12 @@ class Blocktrail(object):
                     price=price,
                     id=tx['hash'],
                     source=in_addr,
-                    destination=out_addr
-                ))
+                    destination=out_addr))
 
         return transactions
 
-    def _clean_tx(self, tx):
+    @staticmethod
+    def _clean_tx(tx):
         input_addresses = {}
         output_addresses = {}
 
@@ -90,7 +90,7 @@ class Blocktrail(object):
 
         for i in inputs:
             addr = (i['address'] if 'address' in i
-                    else self._get_bare_multisig(inputs, i['index']))
+                    else Blocktrail._get_bare_multisig(inputs, i['index']))
 
             value = int(i['value'])
 
@@ -104,7 +104,7 @@ class Blocktrail(object):
                 continue
 
             addr = (o['address'] if 'address' in o
-                    else self._get_bare_multisig(outputs, o['index']))
+                    else Blocktrail._get_bare_multisig(outputs, o['index']))
             value = int(o['value'])
 
             if addr not in output_addresses:
@@ -114,7 +114,8 @@ class Blocktrail(object):
 
         return input_addresses, output_addresses
 
-    def _get_bare_multisig(self, entries, index):
+    @staticmethod
+    def _get_bare_multisig(entries, index):
         for e in entries:
             if e['index'] == index:
                 addresses = sorted(e['multisig_addresses'])

@@ -33,7 +33,7 @@ class Transaction(object):
 
     def __init__(self, timestamp, quantity, asset, **kwargs):
         self.quantity = quantity
-        self.price = float(kwargs['price'] if 'price' in kwargs else None)
+        self.price = float(kwargs['price']) if 'price' in kwargs else 0.0
         self.timestamp = timestamp
         self.asset = asset
         self.data = kwargs

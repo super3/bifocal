@@ -1,8 +1,10 @@
 class Wallet(object):
-    def __init__(self, addresses, transactions=[], blacklist=[]):
+    def __init__(self, addresses, transactions=[],
+                 blacklist=[], exchanges=[]):
         self.addresses = addresses
         self.transactions = transactions
         self.blacklist = blacklist
+        self.exchanges = exchanges
 
     def add_addresses(self, new):
         self.addresses += set(new) - set(self.addresses)
@@ -14,37 +16,37 @@ class Wallet(object):
         self.blacklist = set(new) - set(self.blacklist)
 
     def finalize_tx_list(self):
-        self._sort_transactions()
-        self._filter_transactions()
-        self._check_transaction_signs()
-
-    def _sort_transactions(self):
         self.transactions = sorted(
             self.transactions,
             key=lambda k: k.timestamp)
+        self.transactions = map(self._tx_filter, self.transactions)
+        self.transactions = map(self._check_transaction_sign,
+                                self.transactions)
 
-    def _filter_transactions(self):
-        self.transactions = filter(self._tx_filter, self.transactions)
+    def filter_addresses(self, function):
+        self.addresses = filter(function, self.addresses)
+
+    def filter_transactions(self, function):
+        self.transactions = filter(function, self.transactions)
 
     def _tx_filter(self, tx):
         source, destination = tx.data['source'], tx.data['destination']
+        wallet = self.addresses + self.exchanges
+
         if tx.data['id'] in self.blacklist:
             return False
-        if source in self.addresses and destination not in self.addresses:
+        if source in wallet and destination not in wallet:
             return True
-        if destination in self.addresses and source not in self.addresses:
+        if destination in wallet and source not in wallet:
             return True
-        if source == 'polo' and destination == 'polo':
+        if source in self.exchanges and destination in self.exchanges:
             return True
         return False
 
-    def _check_transaction_signs(self):
-        for tx in self.transactions:
-            source, destination = tx.data['source'], tx.data['destination']
+    def _check_transaction_sign(self, tx):
+        source, destination = tx.data['source'], tx.data['destination']
 
-            if source == 'polo' and destination == 'polo':
-                continue
-            if source in self.addresses and tx.quantity > 0:
-                tx.invert_quantity()
-            if destination in self.addresses and tx.quantity < 0:
-                tx.invert_quantity()
+        if source in self.addresses and tx.quantity > 0:
+            tx.invert_quantity()
+        if destination in self.addresses and tx.quantity < 0:
+            tx.invert_quantity()

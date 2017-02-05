@@ -6,7 +6,7 @@ import math
 
 def date_to_timestamp(date, form):
     """
-    Parse a UTC timestamp from a datetime string to a utc timestamp int
+    Parse a UTC timestamp from a datetime string
     """
     time = datetime.strptime(date, form)
     timestamp = calendar.timegm(time.utctimetuple())
