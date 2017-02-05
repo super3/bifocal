@@ -64,8 +64,6 @@ class Coinbase(object):
         stamp = Coinbase._parse_time(tx)
         quantity = int(round(float(tx['Amount']) * 100000000))
 
-        print tx
-
         # Coinbase Signup Gift
         if '@' in tx['To']:
             return [models.Transaction(

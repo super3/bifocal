@@ -1,5 +1,5 @@
 class Wallet(object):
-    def __init__(self, addresses, transactions=[],
+    def __init__(self, addresses=[], transactions=[],
                  blacklist=[], exchanges=[]):
         self.addresses = addresses
         self.transactions = transactions
