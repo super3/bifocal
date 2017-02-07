@@ -60,7 +60,7 @@ class Coinbase(object):
 
     @staticmethod
     def _parse_tx(tx):
-        # Making all returns lists for convenience.
+        # Making all returns lists so we can use flatten.
         stamp = Coinbase._parse_time(tx)
         quantity = int(round(float(tx['Amount']) * 100000000))
 

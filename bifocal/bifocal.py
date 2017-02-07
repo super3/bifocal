@@ -5,6 +5,8 @@ import utils
 import parsing
 
 
+# TODO: design this better and reimplement
+
 class Bifocal(object):
 
     def __init__(self, year=None, addresses={}, polo_key=None,
@@ -12,25 +14,22 @@ class Bifocal(object):
 
         self.wallets = {}
         self.results = {}
-        self.coinbase_csv = coinbase_csv
+
+        self._coinbase_csv = coinbase_csv
 
         if polo_secret is not None and polo_key is not None:
             self._polo = apis.Polo(polo_key, polo_secret)
         else:
             self._polo = None
 
+        if blocktrail_key is None:
+            raise ValueError('Blocktrail Key Required')
         self._blocktrail = apis.Blocktrail(blocktrail_key)
 
         for asset in addresses:
             self.wallets[asset] = models.Wallet(addresses[asset])
             self._make_transaction_lists(asset)
-
-            if self._polo is not None:
-                self._add_polo_sales(asset)
-                self._add_polo_blacklist(asset)
-            if self.coinbase_csv is not None:
-                self._add_coinbase_transactions()
-                self._add_coinbase_blacklist()
+            self._make_blacklists(asset)
 
             self.wallets[asset].finalize_tx_list()
             self._make_asset_results(asset)
@@ -40,10 +39,26 @@ class Bifocal(object):
             self.wallets[asset].add_transactions(utils.flatten(map(
                 self._blocktrail.get_address_transactions,
                 self.wallets[asset].addresses)))
+
+            if self.coinbase_csv is not None:
+                self._add_coinbase_transactions()
+
         else:
             self.wallets[asset].add_transactions(utils.flatten(map(
                 (lambda a: apis.Blockscan.get_address_transactions(a, asset)),
                 self.wallets[asset].addresses)))
+
+            if self._polo is not None:
+                self._add_polo_sales(asset)
+
+    def _make_blacklists(self, asset):
+        if asset == 'BTC':
+            if self._coinbase_csv is not None:
+                self._add_coinbase_blacklist()
+
+        else:
+            if self._polo is not None:
+                self._add_polo_blacklist(asset)
 
     def _add_polo_sales(self, asset):
         if asset != 'BTC':
@@ -61,10 +76,12 @@ class Bifocal(object):
         self.wallets[asset].add_blacklist_ids(blacklist)
 
     def _add_coinbase_blacklist(self):
-        pass
+        blacklist = get_transfer_txids(self.coinbase_csv)
+        self.wallets['BTC'].add_blacklist_ids(blacklist)
 
     def _add_coinbase_transactions(self):
-        pass
+        self.wallets['BTC'].add_transactions(
+            parsing.Coinbase.get_transactions(self._coinbase_csv))
 
     def _make_asset_results(self, asset):
         fifo = accounting.FIFO(self.wallets[asset].transactions)

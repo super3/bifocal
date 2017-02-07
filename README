@@ -32,3 +32,8 @@ Spreadsheet parsing
 
 More tests
 Test More things
+
+
+Assumptions:
+Exchanges only get deposit from the user.
+Exchanges only give withdrawals to the user.

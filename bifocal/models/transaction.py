@@ -33,15 +33,17 @@ class Transaction(object):
 
     def __init__(self, timestamp, quantity, asset, **kwargs):
         self.quantity = quantity
-        self.price = float(kwargs['price']) if 'price' in kwargs else 0.0
+        try:
+            self.price = float(kwargs['price']) if 'price' in kwargs else 0.0
+        except ValueError:
+            raise ValueError('Invalid price: %s' % kwargs['price'])
+
         self.timestamp = timestamp
-        self.asset = asset
+        self.asset = asset'
         self.data = kwargs
 
         if type(self.quantity) is not int:
             raise ValueError('Invalid quantity: %s' % self.quantity)
-        if type(self.price) is not float:
-            raise ValueError('Invalid price: %s' % self.price)
         if type(self.timestamp) is not int:
             raise ValueError('Invalid timestamp: %s' % self.timestamp)
 
