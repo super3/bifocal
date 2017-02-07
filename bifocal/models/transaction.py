@@ -39,7 +39,7 @@ class Transaction(object):
             raise ValueError('Invalid price: %s' % kwargs['price'])
 
         self.timestamp = timestamp
-        self.asset = asset'
+        self.asset = asset
         self.data = kwargs
 
         if type(self.quantity) is not int:
