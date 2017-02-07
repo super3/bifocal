@@ -13,6 +13,11 @@ class Blockchain(object):
         return utils.parse_json(ret)
 
     @staticmethod
+    def get_tx_by_id(txid):
+        data = Blockchain._request('rawtx', txid)
+        return data
+
+    @staticmethod
     def get_address_transactions(address):
         data = Blockchain._request('rawaddr', address)
         transactions = data['txs']

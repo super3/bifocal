@@ -88,32 +88,6 @@ class Coinbase(object):
                         destination='Coinbase',
                         datestring=tx['Timestamp'])]
 
-        # Transfer out of Coinbase
-        if tx['To'] != '':
-            return [models.Transaction(
-                        timestamp=stamp,
-                        quantity=quantity,
-                        asset='BTC',
-                        id=tx['Bitcoin Hash'],
-                        source='Coinbase',
-                        destination=tx['To'],
-                        datestring=tx['Timestamp'])]
-
-        # Transfer in to Coinbase
-        # This is more complicated because it can have multiple inputs
-        # Therefore we need to parse the TX using a block explorer
-        # This is going to be a bit hacky.
-        raw_tx = Blockchain._request('rawtx', tx['Bitcoin Hash'])
-
-        for o in raw_tx['out']:
-            if int(o['value']) == abs(quantity):
-                address = o['addr']
-
-        txns = Blockchain._parse_tx(raw_tx, address)
-
-        for tx in txns:
-            tx.data['destination'] = 'Coinbase'
-
         return txns
 
     @staticmethod
