@@ -19,7 +19,7 @@ class Wallet(object):
         self.transactions = sorted(
             self.transactions,
             key=lambda k: k.timestamp)
-        self.transactions = map(self._tx_filter, self.transactions)
+        self.transactions = filter(self._tx_filter, self.transactions)
         self.transactions = map(self._check_transaction_sign,
                                 self.transactions)
 

@@ -10,12 +10,18 @@ import parsing
 class Bifocal(object):
 
     def __init__(self, year=None, addresses={}, polo_key=None,
-                 polo_secret=None, blocktrail_key=None, coinbase_csv=None):
+                 polo_secret=None, blocktrail_key=None, coinbase_csv=None,
+                 celery_csv=None):
 
         self.wallets = {}
+
+        for asset in addresses:
+            self.wallets[asset] = models.Wallet(addresses[asset])
+
         self.results = {}
 
         self._coinbase_csv = coinbase_csv
+        self._celery_csv = celery_csv
 
         if polo_secret is not None and polo_key is not None:
             self._polo = apis.Polo(polo_key, polo_secret)
@@ -27,7 +33,6 @@ class Bifocal(object):
         self._blocktrail = apis.Blocktrail(blocktrail_key)
 
         for asset in addresses:
-            self.wallets[asset] = models.Wallet(addresses[asset])
             self._make_transaction_lists(asset)
             self._make_blacklists(asset)
 
@@ -40,8 +45,10 @@ class Bifocal(object):
                 self._blocktrail.get_address_transactions,
                 self.wallets[asset].addresses)))
 
-            if self.coinbase_csv is not None:
+            if self._coinbase_csv is not None:
                 self._add_coinbase_transactions()
+            if self._celery_csv is not None:
+                self._add_celery_transactions()
 
         else:
             self.wallets[asset].add_transactions(utils.flatten(map(
@@ -55,6 +62,8 @@ class Bifocal(object):
         if asset == 'BTC':
             if self._coinbase_csv is not None:
                 self._add_coinbase_blacklist()
+            if self._celery_csv is not None:
+                self._add_celery_blacklist()
 
         else:
             if self._polo is not None:
@@ -76,7 +85,7 @@ class Bifocal(object):
         self.wallets[asset].add_blacklist_ids(blacklist)
 
     def _add_coinbase_blacklist(self):
-        blacklist = get_transfer_txids(self.coinbase_csv)
+        blacklist = parsing.Coinbase.get_transfer_txids(self._coinbase_csv)
         self.wallets['BTC'].add_blacklist_ids(blacklist)
 
     def _add_coinbase_transactions(self):
@@ -89,6 +98,14 @@ class Bifocal(object):
         self.results[asset] = {
             'FIFO': fifo,
             'LIFO': lifo}
+
+    def _add_celery_blacklist(self):
+        blacklist = parsing.Celery.get_transfer_txids(self._celery_csv)
+        self.wallets['BTC'].add_blacklist_ids(blacklist)
+
+    def _add_celery_transactions(self):
+        self.wallets['BTC'].add_transactions(
+            parsing.Celery.get_transactions(self._celery_csv))
 
     def print_balances(self):
         pass

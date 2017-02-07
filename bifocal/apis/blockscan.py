@@ -33,12 +33,12 @@ class Blockscan(object):
 
     @staticmethod
     def get_tx_source(txid):
-        tx = get_tx_by_id(txid)
+        tx = Blockscan.get_tx_by_id(txid)
         return tx['data'][0]['source']
 
     @staticmethod
     def get_tx_destination(txid):
-        tx = get_tx_by_id(txid)
+        tx = Blockscan.get_tx_by_id(txid)
         return tx['data'][0]['destination']
 
     @staticmethod

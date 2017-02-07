@@ -74,9 +74,9 @@ class Polo(object):
         btc_trades = []
         for tx in history:
             tx.asset = currency_pair.split('_')[1]
-            counter_trades.append(models.Transaction(
-                quantity=tx.data['total'] * -1,
-                asset=currency_pair.split('_')[0],
+            btc_trades.append(models.Transaction(
+                quantity=int(round(tx.data['total'] * -1 * 100000000)),
+                asset='BTC',
                 id=tx.data['id'],
                 timestamp=tx.timestamp,
                 source='polo',
@@ -92,7 +92,7 @@ class Polo(object):
         price_in_btc = float(tx['rate'])
 
         return models.Transaction(
-            quantity=float(tx['amount']) * mod,
+            quantity=int(round(float(tx['amount']) * mod * 100000000)),
             asset=None,
             price=price_in_btc * Coindesk.get_price_by_timestamp(stamp),
             id=tx['globalTradeID'],
@@ -100,7 +100,7 @@ class Polo(object):
             timestamp=stamp,
             source='polo',
             destination='polo',
-            total=tx['total']
+            total=float(tx['total'])
         )
 
     def _deposits_and_withdrawals(self):
