@@ -11,6 +11,7 @@ class Polo(object):
     def __init__(self, api_key, secret):
         self._api_key = api_key
         self._secret = secret
+        self._chart = Coindesk.get_chart()
         self._cache = {}
 
     @staticmethod
@@ -73,6 +74,8 @@ class Polo(object):
 
         btc_trades = []
         for tx in history:
+            price = self._get_coindesk_price_by_timestamp(tx.timestamp)
+
             tx.asset = currency_pair.split('_')[1]
             btc_trades.append(models.Transaction(
                 quantity=int(round(tx.data['total'] * -1 * 100000000)),
@@ -81,20 +84,29 @@ class Polo(object):
                 timestamp=tx.timestamp,
                 source='polo',
                 destination='polo',
-                price=Coindesk.get_price_by_timestamp(tx.timestamp)
+                price=price
             ))
 
         return history, btc_trades
+
+    def _get_coindesk_price_by_timestamp(self, stamp):
+        date = utils.timestamp_to_date(stamp, '%Y-%m-%d')
+        if date in self._chart:
+            price = self._chart[date]
+        else:
+            price = Coindesk.get_price_by_timestamp(stamp)
+        return price
 
     def _parse_tx(self, tx):
         mod = -1 if tx['type'] == 'sell' else 1
         stamp = utils.date_to_timestamp(tx['date'], '%Y-%m-%d  %H:%M:%S')
         price_in_btc = float(tx['rate'])
+        price = price_in_btc * self._get_coindesk_price_by_timestamp(stamp)
 
         return models.Transaction(
             quantity=int(round(float(tx['amount']) * mod * 100000000)),
             asset=None,
-            price=price_in_btc * Coindesk.get_price_by_timestamp(stamp),
+            price=price,
             id=tx['globalTradeID'],
             price_in_btc=price_in_btc,
             timestamp=stamp,
@@ -128,7 +140,7 @@ class Polo(object):
     def _parse_deposit(self, deposit):
         asset = deposit['currency']
         stamp = deposit['timestamp']
-        btc_in_usd = Coindesk.get_price_by_timestamp(stamp)
+        btc_in_usd = self._get_coindesk_price_by_timestamp(stamp)
         if asset != 'BTC':
             asset_in_btc = self.get_daily_close_price('BTC_%s' % asset, stamp)
             price = asset_in_btc * btc_in_usd
@@ -147,7 +159,7 @@ class Polo(object):
     def _parse_withdrawal(self, withdrawal):
         asset = withdrawal['currency']
         stamp = withdrawal['timestamp']
-        btc_in_usd = Coindesk.get_price_by_timestamp(stamp)
+        btc_in_usd = self._get_coindesk_price_by_timestamp(stamp)
         if asset != 'BTC':
             asset_in_btc = self.get_daily_close_price('BTC_%s' % asset, stamp)
             price = asset_in_btc * btc_in_usd
