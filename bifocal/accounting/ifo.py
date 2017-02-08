@@ -36,11 +36,11 @@ from bifocal.models import Transaction
 
 class IFO(object):
 
-    def __init__(self, transactions=[]):
+    def __init__(self, transactions=None):
         self._started_at = datetime.datetime.now()
         self._finished_at = None
 
-        self._transactions = transactions
+        self._transactions = [] if transactions is None else transactions
 
         self._balance = 0
         self.inventory = deque()

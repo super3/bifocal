@@ -33,7 +33,7 @@ from ifo import IFO
 
 class FIFO(IFO):
 
-    def __init__(self, transactions=[]):
+    def __init__(self, transactions=None):
         IFO.__init__(self, transactions)
 
     def _fill(self, transaction):

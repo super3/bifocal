@@ -16,7 +16,7 @@ class Bifocal(object):
         self.wallets = {}
 
         for asset in addresses:
-            self.wallets[asset] = models.Wallet(addresses[asset])
+            self.wallets[asset] = models.Wallet(addresses=addresses[asset])
 
         self.results = {}
 
@@ -40,9 +40,9 @@ class Bifocal(object):
 
     def _make_transaction_lists(self, asset):
         if asset == 'BTC':
-            self.wallets[asset].transactions += utils.flatten(map(
+            self.wallets['BTC'].transactions += utils.flatten(map(
                 self._blocktrail.get_address_transactions,
-                self.wallets[asset].addresses))
+                self.wallets['BTC'].addresses))
 
             if self._coinbase_csv is not None:
                 self.wallets['BTC'].exchanges += ['Coinbase']
@@ -53,14 +53,17 @@ class Bifocal(object):
 
         else:
             print asset
-            print '%s %s' % (1, len(self.wallets[asset].transactions))
+            print '%s %s' % (1, len(self.wallets['SJCX'].transactions))
+            print '%s %s' % (1, len(self.wallets['BTC'].transactions))
             self.wallets[asset].transactions += utils.flatten(map(
                 (lambda a: apis.Blockscan.get_address_transactions(a, asset)),
                 self.wallets[asset].addresses))
-            print '%s %s' % (2, len(self.wallets[asset].transactions))
+            print '%s %s' % (2, len(self.wallets['SJCX'].transactions))
+            print '%s %s' % (2, len(self.wallets['BTC'].transactions))
             if self._polo is not None:
                 self._add_polo_sales(asset)
-            print '%s %s' % (3, len(self.wallets[asset].transactions))
+            print '%s %s' % (3, len(self.wallets['SJCX'].transactions))
+            print '%s %s' % (3, len(self.wallets['BTC'].transactions))
 
     def _make_blacklists(self, asset):
         if asset == 'BTC':
@@ -74,12 +77,15 @@ class Bifocal(object):
                 self._add_polo_blacklist(asset)
 
     def _add_polo_sales(self, asset):
+        print asset
         if asset != 'BTC':
             # assumes all non-btc assets are paired to BTC
             # each transaction is paired with a counter tx
             # I.e. every sale of SJCX is also a purchase of BTC
             txns, counter_txns = self._polo.get_trade_history(
                 'BTC_' + asset)
+            print '%s %s' % ('txns', len(txns))
+            print '%s %s' % ('counter_txns', len(counter_txns))
             self.wallets[asset].exchanges += ['polo']
             self.wallets['BTC'].exchanges += ['polo']
             self.wallets[asset].transactions += txns

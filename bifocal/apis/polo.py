@@ -75,7 +75,6 @@ class Polo(object):
         btc_trades = []
         for tx in history:
             price = self._get_coindesk_price_by_timestamp(tx.timestamp)
-
             tx.asset = currency_pair.split('_')[1]
             btc_trades.append(models.Transaction(
                 quantity=int(round(tx.data['total'] * -1 * 100000000)),
@@ -84,8 +83,7 @@ class Polo(object):
                 timestamp=tx.timestamp,
                 source='polo',
                 destination='polo',
-                price=price
-            ))
+                price=price))
 
         return history, btc_trades
 
@@ -112,8 +110,7 @@ class Polo(object):
             timestamp=stamp,
             source='polo',
             destination='polo',
-            total=float(tx['total'])
-        )
+            total=float(tx['total']))
 
     def _deposits_and_withdrawals(self):
         if 'movements' not in self._cache:

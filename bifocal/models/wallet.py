@@ -1,10 +1,11 @@
 class Wallet(object):
-    def __init__(self, addresses=[], transactions=[],
-                 blacklist=[], exchanges=[]):
-        self.addresses = addresses
-        self.transactions = transactions
-        self.blacklist = blacklist
-        self.exchanges = exchanges
+    def __init__(self, addresses=None, transactions=None,
+                 blacklist=None, exchanges=None):
+        self.addresses = [] if addresses is None else addresses
+        self.transactions = [] if transactions is None else addresses
+        self.blacklist = [] if blacklist is None else addresses
+        self.exchanges = [] if exchanges is None else addresses
+        print self
 
     def finalize_tx_list(self):
         self.transactions = sorted(
