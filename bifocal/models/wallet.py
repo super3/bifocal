@@ -2,10 +2,9 @@ class Wallet(object):
     def __init__(self, addresses=None, transactions=None,
                  blacklist=None, exchanges=None):
         self.addresses = [] if addresses is None else addresses
-        self.transactions = [] if transactions is None else addresses
-        self.blacklist = [] if blacklist is None else addresses
-        self.exchanges = [] if exchanges is None else addresses
-        print self
+        self.transactions = [] if transactions is None else transactions
+        self.blacklist = [] if blacklist is None else blacklist
+        self.exchanges = [] if exchanges is None else exchanges
 
     def finalize_tx_list(self):
         self.transactions = sorted(
@@ -20,6 +19,10 @@ class Wallet(object):
         wallet = self.addresses + self.exchanges
 
         if tx.data['id'] in self.blacklist:
+            return False
+        if tx.data['source'] in self.blacklist:
+            return False
+        if tx.data['destination'] in self.blacklist:
             return False
         if source in wallet and destination not in wallet:
             return True

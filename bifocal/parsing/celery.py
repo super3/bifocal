@@ -24,8 +24,8 @@ class Celery(object):
         for tx in data:
             dollars = Celery._parse_dollars(tx)
             stamp = utils.date_to_timestamp(tx['Date'], '%b %d %Y')
+            price = round(dollars / float(tx['Amount']), 2)
             tx['Amount'] = int(round(float(tx['Amount']) * 100000000))
-            price = round(float(dollars / tx['Amount']), 2)
 
             if tx['Type'] == 'Buy':
                 txns.append(models.Transaction(

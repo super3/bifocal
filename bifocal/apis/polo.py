@@ -67,8 +67,7 @@ class Polo(object):
             command='returnTradeHistory',
             currencyPair=currency_pair,
             start=0,
-            end=9999999999
-        )
+            end=9999999999)
 
         history = map(self._parse_tx, history)
 
@@ -76,8 +75,9 @@ class Polo(object):
         for tx in history:
             price = self._get_coindesk_price_by_timestamp(tx.timestamp)
             tx.asset = currency_pair.split('_')[1]
+            sign = -1 if tx.data['type'] == 'buy' else 1
             btc_trades.append(models.Transaction(
-                quantity=int(round(tx.data['total'] * -1 * 100000000)),
+                quantity=int(round(tx.data['total'] * sign * 100000000)),
                 asset='BTC',
                 id=tx.data['id'],
                 timestamp=tx.timestamp,
@@ -86,14 +86,6 @@ class Polo(object):
                 price=price))
 
         return history, btc_trades
-
-    def _get_coindesk_price_by_timestamp(self, stamp):
-        date = utils.timestamp_to_date(stamp, '%Y-%m-%d')
-        if date in self._chart:
-            price = self._chart[date]
-        else:
-            price = Coindesk.get_price_by_timestamp(stamp)
-        return price
 
     def _parse_tx(self, tx):
         mod = -1 if tx['type'] == 'sell' else 1
@@ -110,7 +102,16 @@ class Polo(object):
             timestamp=stamp,
             source='polo',
             destination='polo',
-            total=float(tx['total']))
+            total=float(tx['total']),
+            type=tx['type'])
+
+    def _get_coindesk_price_by_timestamp(self, stamp):
+        date = utils.timestamp_to_date(stamp, '%Y-%m-%d')
+        if date in self._chart:
+            price = self._chart[date]
+        else:
+            price = Coindesk.get_price_by_timestamp(stamp)
+        return price
 
     def _deposits_and_withdrawals(self):
         if 'movements' not in self._cache:
@@ -166,7 +167,7 @@ class Polo(object):
             quantity=int(float(withdrawal['amount']) * 100000000),
             asset=withdrawal['currency'],
             price=price,
-            id=withdrawal['status'][10],
+            id=withdrawal['status'][10:],
             timestamp=stamp,
             source='polo',
             destination=withdrawal['address']

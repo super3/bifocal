@@ -62,13 +62,13 @@ def distribute(inputs, outputs):
 
     tx_map = {}
 
-    for i, in_val in inputs.iteritems():
+    for in_addr, in_val in inputs.iteritems():
         txns = {}
         proportion = float(in_val) / total_inputs
 
-        for o, out_val in outputs.iteritems():
+        for out_addr, out_val in outputs.iteritems():
             value = int(math.floor(out_val * proportion))
-            txns[o] = value
+            txns[out_addr] = value
 
         txns['fee'] = int(math.floor(fee * proportion))
 
@@ -79,6 +79,6 @@ def distribute(inputs, outputs):
             if missing_value == 0:
                 break
 
-        tx_map[i] = txns
+        tx_map[in_addr] = txns
 
     return tx_map
